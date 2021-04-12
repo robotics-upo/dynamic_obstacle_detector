@@ -11,10 +11,13 @@
 #include <tf2_ros/transform_listener.h>
 #include <visualization_msgs/MarkerArray.h>
 
+#include <dynamic_obstacle_detector/DynamicObstacles.h>
+
 #include "obstacle_kf.hpp"
 
 #include <math.h> /* isinf, sqrt */
 #include <vector>
+#include <string>
 
 class DynamicObstacleDetector {
 
@@ -23,7 +26,7 @@ public:
   ros::NodeHandle n_;
   sensor_msgs::PointCloud pre_cloud_;
   ros::Subscriber scan_sub_;
-  ros::Publisher obs_pub_, dyn_obs_pub_, points_pub_;
+  ros::Publisher obs_pub_, dyn_obs_pub_, points_pub_, obstacles_pub_;
   std::string input_scan_topic_;
   std::string odom_frame_;
   tf2_ros::Buffer tf_buffer_;
@@ -117,10 +120,12 @@ public:
     scan_sub_ = n_.subscribe<sensor_msgs::LaserScan>(
         input_scan_topic_.c_str(), 1, &DynamicObstacleDetector::scan_cb, this);
 
-    obs_pub_ = nh_.advertise<visualization_msgs::MarkerArray>("/dynamic_obstacles/static", 0);
+    obs_pub_ = nh_.advertise<visualization_msgs::MarkerArray>("/dynamic_obstacles/static_markers", 0);
     dyn_obs_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
-        "/dynamic_obstacles/dynamic", 1);
+        "/dynamic_obstacles/dynamic_markers", 1);
     points_pub_ = nh_.advertise<visualization_msgs::Marker>("/dynamic_obstacles/points", 0);
+
+    obstacles_pub_ = nh_.advertise<dynamic_obstacle_detector::DynamicObstacles>("/dynamic_obstacles", 0);
     
   }
 
@@ -259,14 +264,21 @@ public:
 		tracked_obstacles_ = temp;
 		
 		// Publish dynamic obstacles
-		publishDynObsMarker();
+		//publishDynObsMarker();
+
+    // Publish DynamicObstacles message
+    publishDynamicObstacles();
   
   }
 
 
 
-  void publishDynObsMarker()
+  void publishDynamicObstacles()
 	{
+
+    dynamic_obstacle_detector::DynamicObstacles dyn_obs;
+    dynamic_obstacle_detector::DynamicObstacle ob;
+
 		visualization_msgs::MarkerArray obsMarkers;
 		visualization_msgs::Marker marker;
 
@@ -275,9 +287,11 @@ public:
 		r = 0.0;
 		g = 1.0;
 		b = 0.0;
-			
-		marker.header.frame_id = odom_frame_;
-		marker.header.stamp = ros::Time::now();
+
+    dyn_obs.header.frame_id = odom_frame_;
+    dyn_obs.header.stamp = ros::Time::now();	
+		marker.header.frame_id = dyn_obs.header.frame_id;
+		marker.header.stamp = dyn_obs.header.stamp;
 		marker.ns = ros::this_node::getName();
 		for(int i=0; i<(int)tracked_obstacles_.size(); i++)
 		{
@@ -295,12 +309,24 @@ public:
       
         if(linvel >= min_vel_tracked_)
         {
+
+          //Dynamic obstacle
+          ob.name = std::to_string(tracked_obstacles_[i].id);
+          ob.position.x = tracked_obstacles_[i].x(0,0);
+          ob.position.y = tracked_obstacles_[i].x(1,0);
+          ob.position.z = 0.0;
+          ob.velocity.z = 0.0;
+          ob.velocity.x = vx;
+          ob.velocity.y = vy;
+          ob.reliability = 0.8;
+          dyn_obs.obstacles.push_back(ob);
+
+
           // Cylinder
           marker.id = 20*tracked_obstacles_[i].id;
           marker.type = visualization_msgs::Marker::CYLINDER;
           marker.action = visualization_msgs::Marker::ADD;
-          marker.pose.position.x = tracked_obstacles_[i].x(0,0);
-          marker.pose.position.y = tracked_obstacles_[i].x(1,0);
+          marker.pose.position = ob.position;
           marker.pose.position.z = 0.5;
           marker.pose.orientation.x = 0.0;
           marker.pose.orientation.y = 0.0;
@@ -320,9 +346,8 @@ public:
           marker.id = 20*tracked_obstacles_[i].id+1;
           marker.type = visualization_msgs::Marker::ARROW;
           marker.action = visualization_msgs::Marker::ADD;
-          marker.pose.position.x = tracked_obstacles_[i].x(0,0);
-          marker.pose.position.y = tracked_obstacles_[i].x(1,0);
-          marker.pose.position.z = 0.5;
+          marker.pose.position = marker.pose.position;
+          
           //marker.points.push_back(marker.pose.position);
           //geometry_msgs::Point end;
           //end.x = x_arrow;
@@ -350,6 +375,9 @@ public:
 			// 	obsMarkers.markers.push_back(marker);
 			// }
 		}
+
+    // publish obstacle
+    obstacles_pub_.publish(dyn_obs);
 		// publish marker:
 		dyn_obs_pub_.publish(obsMarkers);
 	}

@@ -80,22 +80,21 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        base_link:
-          bumblebee:
-            {}
-          laserback:
-            {}
-          laserfront:
-            {}
-          laservtcal:
-            {}
         odom:
-          {}
+          base_link:
+            bumblebee:
+              {}
+            laserback:
+              {}
+            laserfront:
+              {}
+            laservtcal:
+              {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /dynamic_obstacles/dynamic
+      Marker Topic: /dynamic_obstacles/dynamic_markers
       Name: MarkerArray
       Namespaces:
         /dynamic_obstacle_detector: true
@@ -103,7 +102,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /dynamic_obstacles/static
+      Marker Topic: /dynamic_obstacles/static_markers
       Name: MarkerArray
       Namespaces:
         obstacles: true

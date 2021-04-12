@@ -23,12 +23,10 @@ It detect groups of points in a laser scan that are then tracked using Kalman Fi
 
 ## Publications
 
-- */dynamic_obstacles/static* <visualization_msgs::MarkerArray>. RViz marker with the dynamic obstacles candidates.
-- */dynamic_obstacles/dynamic* <visualization_msgs::MarkerArray>. Rviz marker with the dynamic obstacles detected.
+- */dynamic_obstacles* <dynamic_obstacle_detector::DynamicObstacles>. message with the obstacle information similarly to the people msg.
+- */dynamic_obstacles/static_markers* <visualization_msgs::MarkerArray>. RViz marker with the dynamic obstacles candidates.
+- */dynamic_obstacles/dynamic_markers* <visualization_msgs::MarkerArray>. Rviz marker with the dynamic obstacles detected.
 
 
-## ToDo:
-
-- Publishing messages with the obstacles (people_msgs or custom messages).
 
 
