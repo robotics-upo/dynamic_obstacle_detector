@@ -1,0 +1,56 @@
+<!-- -->
+<launch>
+
+  <arg name="debug" default="false"/>
+  <arg name="launch_prefix" value="gdb -ex run --args" if="$(arg debug)"/> #xterm -e gdb --args
+  <arg name="launch_prefix" value="" unless="$(arg debug)"/>
+
+  <arg name="frogbag" default="true"/>
+  <arg name="scan_topic" value="scan_filtered_drop" if="$(arg frogbag)"/>
+  <arg name="scan_topic" value="scan_raw" unless="$(arg frogbag)"/>
+
+  <group if="$(arg frogbag)">
+
+    <param name="use_sim_time" value="true" />
+
+    <node pkg="rosbag" type="play" name="bagplayer" args="--clock /home/kenny/Downloads/UPO_pioneer_sensors_2014-04-29-11-36-22.bag"/>
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
+        <rosparam command="load" file="$(find obstacle_detector)/launch/my_laser_config.yaml" />
+        <remap from="scan" to="scanfront" /> #scanfront in FROG bags
+    </node>
+
+    <node name="topic_drop" pkg="topic_tools" type="drop" args="scan_filtered 3 4" />
+
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find dynamic_obstacle_detector)/launch/frogbag.rviz" />
+  
+  </group>
+
+  <!--<node type="laser_scan_assembler" pkg="laser_assembler" name="my_assembler">
+    <remap from="scan" to="scan_filtered"/>
+    <param name="max_scans" type="int" value="1" />
+    <param name="fixed_frame" type="string" value="odom" />
+  </node>-->
+  <include unless="$(arg frogbag)" file="$(find gazebo_sfm_plugin)/launch/tiago_pedestrians.launch" />
+
+  <node pkg="dynamic_obstacle_detector" type="dynamic_obstacle_detector_node" name="dynamic_obstacle_detector" output="screen" launch-prefix="$(arg launch_prefix)" >
+        <param name="input_scan_topic" value="$(arg scan_topic)" />
+        <param name="odom_frame" value="odom" />
+        <param name="cluster_max_distance_points" value="0.6" />
+        <param name="cluster_min_points" value="3" />
+        <param name="cluster_max_points" value="40" />
+        <param name="min_vel_tracked" value="0.37" />
+        <param name="max_vel_tracked" value="1.8" />
+        <param name="max_tracked_distance" value="0.55" />
+        <param name="max_tracked_sec" value="0.8" />
+  </node>
+  
+  <!--<node pkg="dynamic_obstacle_detector" type="laser_clustering.py" name="laser_clustering" output="screen" >
+        <param name="input_scan_topic" value="$(arg scan_topic)" />
+        <param name="dist_from_obs" value="0.2" />
+        <param name="cluster_bandwidth" value="0.6"/>
+  </node>-->
+
+
+  
+</launch>

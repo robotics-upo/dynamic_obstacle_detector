@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dynamic_obstacle_detector</name>
+  <version>1.0.0</version>
+  <description>The dynamic_obstacle_detector package</description>
+
+  <maintainer email="noeperez@upo.es">Noé Pérez-Higueras</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">https://github.com/robotics-upo/dynamic_obstacle_detector</url>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>laser_geometry</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>laser_geometry</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>tf2_ros</build_export_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>laser_geometry</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>
