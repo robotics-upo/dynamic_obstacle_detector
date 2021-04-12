@@ -16,3 +16,19 @@ It detect groups of points in a laser scan that are then tracked using Kalman Fi
 - **max_tracked_sec**. Maximum time [sec] between detections of an obstacle to be tracked. (Def: 1.0).
 
 
+## Subscriptions
+
+- */scan*: <sensor_msgs::LaserScan>. Laser scan topic. Modified by the parameter **input_scan_topic**.
+
+
+## Publications
+
+- */dynamic_obstacles/static* <visualization_msgs::MarkerArray>. RViz marker with the dynamic obstacles candidates.
+- */dynamic_obstacles/dynamic* <visualization_msgs::MarkerArray>. Rviz marker with the dynamic obstacles detected.
+
+
+## ToDo:
+
+- Publishing messages with the obstacles (people_msgs or custom messages).
+
+
