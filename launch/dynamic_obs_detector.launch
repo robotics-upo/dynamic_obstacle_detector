@@ -5,7 +5,7 @@
   <arg name="launch_prefix" value="gdb -ex run --args" if="$(arg debug)"/> #xterm -e gdb --args
   <arg name="launch_prefix" value="" unless="$(arg debug)"/>
 
-  <arg name="frogbag" default="true"/>
+  <arg name="frogbag" default="false"/>
   <arg name="scan_topic" value="scan_filtered_drop" if="$(arg frogbag)"/>
   <arg name="scan_topic" value="scan_raw" unless="$(arg frogbag)"/>
 
